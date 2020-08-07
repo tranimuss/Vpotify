@@ -6,7 +6,6 @@ import pickle
 import spottransfer
 from sys import exit
 import PySimpleGUI as sg
-
 def save_obj(obj, name):
     with open(name + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
@@ -22,20 +21,33 @@ def spotify_transfer(username): #"qszc84oktwgj54ui831wfgvwz"
 	scope = 'playlist-modify-private'
 	spotify = spottransfer.Spotify(username, clientid, clientsecret, redirect, scope)
 	spotify.get_userid()
-	playlist_id = spotify.create_playlist("VK dump", "These are my songs from VK")
+	playlist_id = spotify.create_playlist("VK dump", "")
 	try:
-		songs = load_obj("D:/botpy/parse/songs")
+		songs = load_obj("songs")
 	except:
 		print("ERROR: songs file not found")
+
+	ids = []
+	i = 0
 
 	while True:
 		try:
 			song = songs.popitem()
 		except:
 			break
-		song_id = spotify.search_song(song[0] + " " + song[1])
+		query = song[0] + " " + song[1]
+		query = query.lower().replace("feat.", "").replace('(',"").replace(")","")
+		song_id = spotify.search_song(query)
 		if song_id != None:
-			spotify.add_song_to_playlist(playlist_id, song_id)
+			ids.append(song_id)
+			i += 1
+		if i > 20:
+			ids.reverse()
+			spotify.add_song_to_playlist(playlist_id, ids)
+			ids = []
+			i = 0
+	ids.reverse()
+	spotify.add_song_to_playlist(playlist_id, ids)
 
 sg.theme('DarkAmber')
 layout = [  [sg.Text('VK Username'), sg.InputText()], 
@@ -51,13 +63,13 @@ while True:
 	if event == sg.WIN_CLOSED or event == 'Cancel':
 		break
 	if event == 'Ok':
-		print(values)
 		break
 
 window.close()
 
 options = webdriver.ChromeOptions() 
 options.add_experimental_option("excludeSwitches", ["enable-logging"])
+options.add_argument('headless')
 try:
 	driver = webdriver.Chrome(options=options, executable_path="chromedriver.exe")
 	driver.get("https://vk.com/")
@@ -103,12 +115,16 @@ names_elem = driver.find_elements_by_class_name("audio_row__title_inner")
 artists_elem = driver.find_elements_by_class_name("audio_row__performers")
 names = []
 artists = []
+
 for name in names_elem:
 	names.append(name.get_attribute('innerHTML'))
+
 for artist in artists_elem:
 	html = BeautifulSoup(artist.get_attribute('innerHTML'), features="lxml")
 	artists.append(html.get_text())
+
 songs = {}
+
 for name in names:
 	songs.update({name:artists[names.index(name)]})
 print("Found ", len(songs), " songs")

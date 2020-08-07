@@ -71,7 +71,13 @@ class Spotify(object):
 
 	def add_song_to_playlist(self, playlist_id, song_id):
 		query = "https://api.spotify.com/v1/playlists/{}/tracks".format(playlist_id)
-		query = query + "?uris=spotify:track:" + song_id + "&position=0"
+		try:
+			query = query + "?uris=spotify:track:" + song_id.pop(0)
+			for id in song_id:
+				query = query + ",spotify:track:" + id
+		except:
+			query = query + "?uris=" + song_id
+		query = query + "&position=0"
 		response = requests.post(
 			query,
 			headers = {
@@ -81,6 +87,7 @@ class Spotify(object):
 		)
 		response_json = response.json()
 		print("Added", song_id, "to the playlist")
+		print(response_json)
 
 # username = input("Input Spotify username (i.e. qszc84surgfj54ui831wfgvw):\n")#"qszc84oktwgj54ui831wfgvwz"
 # clientid = "e6b6ffba9aa741bb80d007785f2162e5"
