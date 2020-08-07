@@ -84,7 +84,21 @@ sleep(2)
 driver.find_element_by_id("l_aud").click() 
 sleep(2)
 print("Opened audios!")
-print("Getting titles...")
+
+SCROLL_PAUSE_TIME = 0.5
+
+last_height = driver.execute_script("return document.body.scrollHeight")
+
+while True:
+	driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+	sleep(SCROLL_PAUSE_TIME)
+	new_height = driver.execute_script("return document.body.scrollHeight")
+	if new_height == last_height:
+		print("Got to the bottom!")
+		break
+	last_height = new_height
+
+print("Getting songs...")
 names_elem = driver.find_elements_by_class_name("audio_row__title_inner")
 artists_elem = driver.find_elements_by_class_name("audio_row__performers")
 names = []
