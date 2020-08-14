@@ -26,6 +26,7 @@ def spotify_transfer(username): #"qszc84oktwgj54ui831wfgvwz"
 		songs = load_obj("songs")
 	except:
 		print("ERROR: songs file not found")
+		input("...")
 
 	ids = []
 	i = 0
@@ -49,10 +50,13 @@ def spotify_transfer(username): #"qszc84oktwgj54ui831wfgvwz"
 	ids.reverse()
 	spotify.add_song_to_playlist(playlist_id, ids)
 
-sg.theme('DarkAmber')
+sg.theme('BluePurple')
 layout = [  [sg.Text('VK Username'), sg.InputText()], 
 			[sg.Text('Vk Password'), sg.InputText()], 
 			[sg.Text('Spotify Username'), sg.InputText()],
+			[sg.Text('Browser:'),
+			sg.Radio('Chrome', "DRIVER", default=True),
+    		sg.Radio('Yandex', "DRIVER")],
 			[sg.Button('Ok'), sg.Button('Cancel')] 
 		]
 
@@ -63,21 +67,39 @@ while True:
 	if event == sg.WIN_CLOSED or event == 'Cancel':
 		break
 	if event == 'Ok':
+		print(values)
 		break
 
 window.close()
 
-options = webdriver.ChromeOptions() 
-options.add_experimental_option("excludeSwitches", ["enable-logging"])
-options.add_argument('headless')
-try:
-	driver = webdriver.Chrome(options=options, executable_path="chromedriver.exe")
-	driver.get("https://vk.com/")
-	assert "ВКонтакте" in driver.title
-	print("Opened VK!")
-except:
-	print("Something wrong happened!")
-	exit(1)
+
+if values[3]:
+	options = webdriver.ChromeOptions() 
+	options.add_experimental_option("excludeSwitches", ["enable-logging"])
+	options.add_argument('headless')
+	try:
+		driver = webdriver.Chrome(options=options, executable_path="chromedriver.exe")
+		driver.get("https://vk.com/")
+		assert "ВКонтакте" in driver.title
+		print("Opened VK!")
+	except:
+		print("Something wrong happened!")
+		input("...")
+
+elif values[4]:
+	binary_yandex_driver_file = 'yandexdriver.exe'
+	options = webdriver.ChromeOptions() 
+	options.add_experimental_option("excludeSwitches", ["enable-logging"])
+	options.add_argument('headless')
+	try:
+		driver = webdriver.Chrome(binary_yandex_driver_file, options=options)
+		driver.get("https://vk.com/")
+		assert "ВКонтакте" in driver.title
+		print("Opened VK!")
+	except:
+		print("Something wrong happened!")
+		input("...")
+
 
 username = values[0]
 username_field = driver.find_element_by_id('index_email')
