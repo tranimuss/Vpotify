@@ -26,7 +26,7 @@ def spotify_transfer(username): #"qszc84oktwgj54ui831wfgvwz"
 		songs = load_obj("songs")
 	except:
 		print("ERROR: songs file not found")
-		input("...")
+		input("Input anything to close the program...")
 
 	ids = []
 	i = 0
@@ -67,7 +67,6 @@ while True:
 	if event == sg.WIN_CLOSED or event == 'Cancel':
 		break
 	if event == 'Ok':
-		print(values)
 		break
 
 window.close()
@@ -82,9 +81,11 @@ if values[3]:
 		driver.get("https://vk.com/")
 		assert "ВКонтакте" in driver.title
 		print("Opened VK!")
-	except:
+	except Exception as e:
 		print("Something wrong happened!")
-		input("...")
+		print(e)
+		input("Input anything to close the program...")
+		exit(400)
 
 elif values[4]:
 	binary_yandex_driver_file = 'yandexdriver.exe'
@@ -96,9 +97,11 @@ elif values[4]:
 		driver.get("https://vk.com/")
 		assert "ВКонтакте" in driver.title
 		print("Opened VK!")
-	except:
+	except Exception as e:
 		print("Something wrong happened!")
-		input("...")
+		print(e)
+		input("Input anything to close the program...")
+		exit(400)
 
 
 username = values[0]
@@ -111,11 +114,15 @@ password_field = driver.find_element_by_id('index_pass')
 password_field.clear()
 password_field.send_keys(password)
 password_field.send_keys(Keys.ENTER)
-print("Logged in!")
-
-print("Waiting to load...")
 sleep(2)
-driver.find_element_by_id("l_aud").click() 
+try:
+	driver.find_element_by_id("l_aud").click()
+	print("Logged in!")
+except Exception as e:
+	print("Couldn't log in!")
+	print(e)
+	input("Input anything to close the program...")
+	exit(400)
 sleep(2)
 print("Opened audios!")
 
